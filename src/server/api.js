@@ -34,8 +34,7 @@ export function apiRouter() {
     res.end(JSON.stringify({ removed: true, rssList: [...rssList] }));
   });
   router.get("list", (req, res) => {
-    res.end(JSON.stringify(["hello", "jim"]));
-    // res.end(JSON.stringify([...rssList]));
+    res.end(JSON.stringify([...rssList]));
   });
   router.get("refresh", async (req, res, next) => {
     try {

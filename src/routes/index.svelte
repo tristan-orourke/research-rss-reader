@@ -10,7 +10,7 @@
     rssList = newRssList;
   });
   const refreshFeeds = async () => {
-    const feeds = await fetch("/api/refresh").then(r => r.json());
+    const {feeds} = await fetch("/api/refresh").then(r => r.json());
     feedsContent = feeds
       .map(feed => {
         const { items, ...feedMeta } = feed;

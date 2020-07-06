@@ -37,16 +37,17 @@ export function apiRouter() {
     res.end(JSON.stringify([...rssList]));
   });
   router.get("refresh", async (req, res, next) => {
-    try {
-      const result = [];
-      for (const url of rssList) {
+    const feeds = [];
+    const errors = [];
+    for (const url of rssList) {
+      try {
         const feed = await parser.parseURL(url);
-        result.push(feed);
+        feeds.push(feed);
+      } catch (e) {
+        errors.push(`Failed to load ${url}`);
       }
-      res.end(JSON.stringify(result));
-    } catch (e) {
-      next(e);
     }
+    res.end(JSON.stringify({ feeds, errors }));
   });
 
   return router;

@@ -1,5 +1,5 @@
 {
-  "name": "Research RSS Reader",
+  "name": "research-rss-reader",
   "description": "A basic rss reader that can track which items are read and unread.",
   "version": "0.1.0",
   "scripts": {

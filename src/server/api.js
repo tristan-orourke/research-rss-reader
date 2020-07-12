@@ -40,6 +40,25 @@ export function apiRouter() {
     res.end(JSON.stringify({ feeds, errors }));
   });
 
+  router.post("items/save", (req, res) => {
+    const { feedUrl, item, tags } = req.body;
+    const saved = storage.saveItem(feedUrl, item, tags);
+    res.end(
+      JSON.stringify({
+        saved,
+        savedItem: storage.getSavedItem(feedUrl, item.link),
+      })
+    );
+  });
+  router.post("items/forget", (req, res) => {
+    const { feedUrl, itemUrl } = req.body;
+    const deleted = storage.forgetItem(feedUrl, itemUrl);
+    res.end(JSON.stringify({ deleted, savedItems: storage.getSavedItems() }));
+  });
+  router.get("items", (req, res) => {
+    res.end(JSON.stringify(storage.getSavedItems()));
+  });
+
   return router;
 }
 

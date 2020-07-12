@@ -1,7 +1,7 @@
 {
-  "name": "TODO",
-  "description": "TODO",
-  "version": "0.0.1",
+  "name": "research-rss-reader",
+  "description": "A basic rss reader that can track which items are read and unread.",
+  "version": "0.1.0",
   "scripts": {
     "dev": "sapper dev",
     "build": "sapper build --legacy",

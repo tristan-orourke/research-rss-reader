@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import Article from "../components/Article.svelte";
   let showAddForm = false;
-  let rssUrl = "https://news.ycombinator.com/rss";
+  let rssUrl = "http://export.arxiv.org/rss/cs.AI";
   let rssList = [];
   let feedsContent = [];
   onMount(async () => {

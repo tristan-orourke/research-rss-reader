@@ -11,12 +11,23 @@
   function focus(el) {
     el.focus();
   }
-  const saveTag = async () => {
+  const addTag = async (tag) => {
+    const tagSet = new Set(tags);
+    tagSet.add(tag);    
+    saveTags([...tagSet]);
+    newTag = "";
+  };
+  const removeTag = async (removedTag) => {
+    const tagSet = new Set(tags);
+    tagSet.delete(removedTag);    
+    saveTags([...tagSet]);
+  };
+  const saveTags = async (newTags) => {
     const {feed, ...coreItem} = item;
     const body = {
       item: coreItem,
       feedUrl: feed.link,
-      tags: [...tags, newTag]
+      tags: newTags
     };
     const {savedItem} = await fetch("api/items/save", {
       method: "POST",
@@ -25,9 +36,12 @@
       },
       body: JSON.stringify(body)
     }).then(r => r.json());
-    tags = savedItem.tags;
+    if (savedItem.tags !== undefined) {
+      tags = savedItem.tags;
+    }
+    console.log(tags);
     toggleAddForm();
-  }
+  };
 </script>
 
 <style>
@@ -50,7 +64,12 @@
   .item-content {
     padding-top: 10px;
   }
-  .item-date {
+  .tag-list {
+    display: flex;
+    flex-direction: row;
+  }
+  .tag-item {
+    padding-right: 20px;
   }
 </style>
 
@@ -69,8 +88,8 @@
           class="tag-input"
           type="text"
           bind:value={newTag}
-          on:keyup={e => e.key === "Enter" && saveTag()} />
-        <button on:click={saveTag}>Save</button>
+          on:keyup={e => e.key === "Enter" && addTag(newTag)} />
+        <button on:click={() => addTag(newTag)}>Save</button>
       </div>
     {:else}
       <div>
@@ -82,9 +101,9 @@
     <summary>{item.contentSnippet.slice(0, 20)}</summary>
     {@html item.content}
   </details>
-  <ul>
+  <ul class="tag-list">
     {#each tags as tag}
-      <li>{tag}</li>
+      <li class="tag-item">{tag}</li>
     {/each}
   </ul>
 </div>

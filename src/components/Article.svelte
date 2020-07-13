@@ -11,25 +11,32 @@
   function focus(el) {
     el.focus();
   }
-  const addTag = async (tag) => {
-    const tagSet = new Set(tags);
-    tagSet.add(tag);    
-    saveTags([...tagSet]);
+  async function addNewTag() {
+    addTag(newTag);
+    toggleAddForm();
     newTag = "";
-  };
-  const removeTag = async (removedTag) => {
+  }
+  const addTag = async tag => {
     const tagSet = new Set(tags);
-    tagSet.delete(removedTag);    
+    tagSet.add(tag);
     saveTags([...tagSet]);
   };
-  const saveTags = async (newTags) => {
-    const {feed, ...coreItem} = item;
+  const removeTag = async removedTag => {
+    const tagSet = new Set(tags);
+    tagSet.delete(removedTag);
+    saveTags([...tagSet]);
+  };
+  async function toggleTag(tag) {
+    tags.includes(tag) ? removeTag(tag) : addTag(tag);
+  }
+  const saveTags = async newTags => {
+    const { feed, ...coreItem } = item;
     const body = {
       item: coreItem,
       feedUrl: feed.link,
       tags: newTags
     };
-    const {savedItem} = await fetch("api/items/save", {
+    const { savedItem } = await fetch("api/items/save", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -40,8 +47,51 @@
       tags = savedItem.tags;
     }
     console.log(tags);
-    toggleAddForm();
   };
+
+  const statusTags = {
+    toRead: "status/toRead",
+    finished: "status/finished"
+  };
+  const STATUS_CONSTANTS = {
+    new: {
+      current: "New",
+      action: "Save",
+      style: "status-button-new",
+    },
+    toRead: {
+      current: "To Read",
+      action: "Finish",
+      style: "status-button-toread",
+    },
+    finished: {
+      current: "Finished",
+      action: "Restart",
+      style: "status-button-finished"
+    }
+  };
+  function computeStatus(currentTags) {
+    if (currentTags.includes(statusTags.finished)) {
+      return STATUS_CONSTANTS.finished;
+    } else if (currentTags.includes(statusTags.toRead)) {
+      return STATUS_CONSTANTS.toRead;
+    } else {
+      return STATUS_CONSTANTS.new;
+    }
+  }
+  $: currentStatus = computeStatus(tags);
+  function cycleStatus() {
+    let newTags;
+    if (tags.includes(statusTags.toRead)) {
+      newTags = [statusTags.finished, ...tags.filter(e => e!==statusTags.toRead)];
+    } else if (tags.includes(statusTags.finished)) {
+      newTags = [statusTags.toRead, ...tags.filter(e => e!==statusTags.finished)];
+    } else {
+      newTags = [statusTags.toRead, ...tags];
+    }
+    saveTags(newTags);
+  }
+
 </script>
 
 <style>
@@ -64,6 +114,18 @@
   .item-content {
     padding-top: 10px;
   }
+  .status-button-new {
+    background-color: green;
+  }
+  .status-button-toread {
+    background-color: darkorange;
+  }
+  .status-button-finished {
+    background-color: aqua;
+  }
+  .tag-form {
+    float: right;
+  }
   .tag-list {
     display: flex;
     flex-direction: row;
@@ -79,23 +141,29 @@
       <a href={item.feed.link}>{item.feed.title}</a>
     </div>
     <a class="item-link" href={item.link}>{item.title}</a>
-    <div class="item-date"> {new Date(item.isoDate).toLocaleString()} </div>
-    {#if showTagForm}
-      <div class="add-tag">
-        <button on:click={toggleAddForm}>Cancel</button>
-        <input
-          use:focus
-          class="tag-input"
-          type="text"
-          bind:value={newTag}
-          on:keyup={e => e.key === "Enter" && addTag(newTag)} />
-        <button on:click={() => addTag(newTag)}>Save</button>
-      </div>
-    {:else}
-      <div>
-        <button on:click={toggleAddForm}>+</button>
-      </div>
-    {/if}
+    <div>
+      <button class={currentStatus.style} on:click={cycleStatus}>{currentStatus.action}</button>
+    </div>
+  </div>
+  <div>
+    <div class="tag-form">
+      {#if showTagForm}
+        <div class="add-tag">
+          <button on:click={toggleAddForm}>Cancel</button>
+          <input
+            use:focus
+            class="tag-input"
+            type="text"
+            bind:value={newTag}
+            on:keyup={e => e.key === 'Enter' && addNewTag()} />
+          <button on:click={addNewTag}>Save</button>
+        </div>
+      {:else}
+        <div>
+          <button on:click={toggleAddForm}>+</button>
+        </div>
+      {/if}
+    </div>
   </div>
   <details class="item-content">
     <summary>{item.contentSnippet.slice(0, 20)}</summary>

@@ -57,19 +57,22 @@
   };
   const STATUS_CONSTANTS = {
     new: {
-      current: "New",
+      current: "New!",
       action: "Save",
       style: "status-button-new",
+      actionIcon: "fa-bookmark-o",
     },
     toRead: {
-      current: "To Read",
+      current: "Saved",
       action: "Finish",
       style: "status-button-toread",
+      actionIcon: "fa-book",
     },
     finished: {
       current: "Finished",
       action: "Restart",
-      style: "status-button-finished"
+      style: "status-button-finished",
+      actionIcon: "fa-repeat",
     }
   };
   function computeStatus(currentTags) {
@@ -109,6 +112,9 @@
   .item-feed {
     padding-right: 20px;
   }
+  .item-status {
+    padding-right: 20px;
+  }
   .item-link {
     flex: 1;
     padding-right: 20px;
@@ -117,13 +123,19 @@
     padding-top: 10px;
   }
   .status-button-new {
-    background-color: green;
+    background-color: lightgreen;
+    padding: 3px 8px;    
+    border-radius: 25%;
   }
   .status-button-toread {
     background-color: darkorange;
+    padding: 3px 8px;
+    border-radius: 25%;
   }
   .status-button-finished {
     background-color: aqua;
+    padding: 3px 8px;
+    border-radius: 25%;
   }
   .tag-form {
     float: right;
@@ -139,12 +151,17 @@
 
 <div class="item">
   <div class="item-head">
-    <div class="item-feed">
+    <!-- <div class="item-feed">
       <a href={item.feed.link}>{item.feed.title}</a>
+    </div> -->
+    <div class={`item-status`}>
+      <p class={currentStatus.style}>{currentStatus.current}</p>
     </div>
     <a class="item-link" href={item.link}>{item.title}</a>
     <div>
-      <button class={currentStatus.style} on:click={cycleStatus}>{currentStatus.action}</button>
+      <button on:click={cycleStatus} title={currentStatus.action}>
+        <i class={`fa ${currentStatus.actionIcon}`} aria-hidden="true"></i>
+      </button>
     </div>
   </div>
   <div>

@@ -115,14 +115,14 @@ export default function idbStorage() {
    * @param {string} itemUrl
    * @returns {Promise<any|null>} The saved rss item with specified url, or null if it doesn't exist.
    */
-  async function getSavedItem(itemUrl) {
-    return (await getDb()).get(ITEM_STORE, itemUrl) ?? null;
+  async function getItem(itemUrl) {
+    return (await getDb()).get(ITEM_STORE, itemUrl) || null;
   }
 
   /**
    * Returns a list of saved rss items, along with their feedUrl and tags.
    */
-  async function getSavedItems() {
+  async function getAllItems() {
     return (await getDb()).getAll(ITEM_STORE);
   }
 
@@ -132,7 +132,7 @@ export default function idbStorage() {
     deleteFeed,
     saveItem,
     forgetItem,
-    getSavedItem,
-    getSavedItems,
+    getItem,
+    getAllItems,
   };
 }

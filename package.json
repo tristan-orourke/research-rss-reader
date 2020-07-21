@@ -9,7 +9,9 @@
     "start": "node __sapper__/build",
     "cy:run": "cypress run",
     "cy:open": "cypress open",
-    "test": "run-p --race dev cy:run"
+    "test": "run-p --race dev cy:run",
+    "fix": "eslint --fix src/**/*.{js,svelte}",
+    "format": "prettier --write src/**/*.{js,svelte}"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
@@ -20,9 +22,6 @@
     "sirv": "^0.4.0"
   },
   "devDependencies": {
-    "npm-run-all": "^4.1.5",
-    "sapper": "^0.27.0",
-    "svelte": "^3.0.0",
     "@babel/core": "^7.0.0",
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@babel/plugin-transform-runtime": "^7.0.0",
@@ -32,8 +31,17 @@
     "@rollup/plugin-commonjs": "^12.0.0",
     "@rollup/plugin-node-resolve": "^8.0.0",
     "@rollup/plugin-replace": "^2.2.0",
+    "eslint": "^7.5.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-svelte3": "^2.7.3",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.0.5",
+    "prettier-plugin-svelte": "^1.1.0",
     "rollup": "^2.3.4",
     "rollup-plugin-svelte": "^5.0.1",
-    "rollup-plugin-terser": "^5.3.0"
+    "rollup-plugin-terser": "^5.3.0",
+    "sapper": "^0.27.0",
+    "svelte": "^3.0.0"
   }
 }

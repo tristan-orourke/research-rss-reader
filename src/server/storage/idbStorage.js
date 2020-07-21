@@ -1,4 +1,4 @@
-import { openDB, deleteDB, wrap, unwrap } from 'idb';
+import { openDB } from 'idb';
 
 export default function idbStorage() {
 
@@ -22,7 +22,7 @@ export default function idbStorage() {
           keyPath: "feedUrl"
         });
       }
-    }
+    });
   }
 
   /**
@@ -31,7 +31,7 @@ export default function idbStorage() {
   async function feedList() {
     const db = await getDb();
     const feedObjs = await db.getAll(FEED_STORE);
-    return feedObjs.map(x => f.feedUrl);
+    return feedObjs.map(x => x.feedUrl);
   }
 
   /**
@@ -59,7 +59,7 @@ export default function idbStorage() {
    * @param {string} url Url of an rss feed.
    * @return {Promise<boolean>} True if this feed was deleted, false if it was not present already.
    */
-  function deleteFeed(url) {
+  async function deleteFeed(url) {
     const tx = (await getDb()).transaction(FEED_STORE, "readwrite");
     const feed = await tx.store.get(url);
     // feed will be undefined if the url does not exist in the store.

@@ -1,4 +1,5 @@
-import { timestamp, files, shell, routes } from "@sapper/service-worker";
+/* eslint-disable promise/always-return */
+import { timestamp, files, shell } from "@sapper/service-worker";
 
 const ASSETS = `cache${timestamp}`;
 

@@ -60,19 +60,19 @@
       current: "New!",
       action: "Save",
       style: "status-button-new",
-      actionIcon: "fa-bookmark-o",
+      actionIcon: "fa-bookmark-o"
     },
     toRead: {
       current: "Saved",
       action: "Finish",
       style: "status-button-toread",
-      actionIcon: "fa-book",
+      actionIcon: "fa-book"
     },
     finished: {
       current: "Finished",
       action: "Restart",
       style: "status-button-finished",
-      actionIcon: "fa-repeat",
+      actionIcon: "fa-repeat"
     }
   };
   function computeStatus(currentTags) {
@@ -88,15 +88,20 @@
   function cycleStatus() {
     let newTags;
     if ($tags.includes(statusTags.toRead)) {
-      newTags = [statusTags.finished, ...$tags.filter(e => e!==statusTags.toRead)];
+      newTags = [
+        statusTags.finished,
+        ...$tags.filter(e => e !== statusTags.toRead)
+      ];
     } else if ($tags.includes(statusTags.finished)) {
-      newTags = [statusTags.toRead, ...$tags.filter(e => e!==statusTags.finished)];
+      newTags = [
+        statusTags.toRead,
+        ...$tags.filter(e => e !== statusTags.finished)
+      ];
     } else {
       newTags = [statusTags.toRead, ...$tags];
     }
     saveTags(newTags);
   }
-
 </script>
 
 <style>
@@ -124,7 +129,7 @@
   }
   .status-button-new {
     background-color: lightgreen;
-    padding: 3px 8px;    
+    padding: 3px 8px;
     border-radius: 25%;
   }
   .status-button-toread {
@@ -160,7 +165,7 @@
     <a class="item-link" href={item.link}>{item.title}</a>
     <div>
       <button on:click={cycleStatus} title={currentStatus.action}>
-        <i class={`fa ${currentStatus.actionIcon}`} aria-hidden="true"></i>
+        <i class={`fa ${currentStatus.actionIcon}`} aria-hidden="true" />
       </button>
     </div>
   </div>

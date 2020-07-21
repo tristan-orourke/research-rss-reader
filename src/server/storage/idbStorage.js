@@ -1,4 +1,5 @@
 import { openDB } from 'idb';
+import eq from "lodash/eq";
 
 export default function idbStorage() {
 
@@ -73,37 +74,56 @@ export default function idbStorage() {
 
   /**
    * Permanently save an rss item, along with custom tags.
-   * @param {string} feedUrl
    * @param {Object} item An rss item.
    * @param {string} item.link The url of the rss item.
-   * @param {string[]} tags
-   * @returns {Promise<void>} True if the item was saved.
+   * @param {string} item.feedUrl The rss feed which is the source of this item.
+   * @param {string[]} item.tags the tags saved to the rss item.
+   * @returns {Promise<boolean>} Promise returning True if the item was saved or updated, False if item already exists exactly as is.
    */
-  function saveItem(feedUrl, item, tags) {
+  async function saveItem(item) {
+    const tx = (await getDb()).transaction(ITEM_STORE, "readwrite");
+    const oldItem = await tx.store.get(item.link);
+    if (eq(oldItem, item)) {
+      return false;
+    }
+    tx.store.put(item);
+    return true;
   }
 
   /**
    * Removes an item from savedItems.
    * @param {string} feedUrl
    * @param {string} itemUrl
-   * @returns {boolean} True if the item was deleted. False if it did not exist.
+   * @returns {Promise<boolean>} True if the item was deleted. False if it did not exist.
    */
-  function forgetItem(feedUrl, itemUrl) {
+  async function forgetItem(itemUrl) {
+    const tx = (await getDb()).transaction(ITEM_STORE, "readwrite");
+    const item = await tx.store.get(itemUrl);
+    // feed will be undefined if the url does not exist in the store.
+    if (item === undefined) {
+      return false;
+    } else {
+      tx.store.delete(itemUrl);
+      return true;
+    }
   }
 
+
+
   /**
-   * Return a specific saved item with feedUrl and tags, or null if requested item is not saved.
-   * @param {string} feedUrl
+   * Return a specific saved rss item, or null if requested item is not saved.
    * @param {string} itemUrl
-   * @returns {Object|null}
+   * @returns {Promise<any|null>} The saved rss item with specified url, or null if it doesn't exist.
    */
-  function getSavedItem(feedUrl, itemUrl) {
+  async function getSavedItem(itemUrl) {
+    return (await getDb()).get(ITEM_STORE, itemUrl) ?? null;
   }
 
   /**
    * Returns a list of saved rss items, along with their feedUrl and tags.
    */
-  function getSavedItems() {
+  async function getSavedItems() {
+    return (await getDb()).getAll(ITEM_STORE);
   }
 
   return {

@@ -1,7 +1,7 @@
 import polka from "polka";
 import Parser from "rss-parser";
 import { json as jsonParser } from "body-parser";
-import memoryStorage from "./storage/memoryStorage";
+import memoryStorage from "../storage/memoryStorage";
 
 const storage = memoryStorage();
 

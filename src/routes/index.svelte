@@ -1,16 +1,26 @@
 <script>
   import { onMount } from "svelte";
+  import { writable } from 'svelte/store';
   import Article from "../components/Article.svelte";
+  import { fetchRssFeeds } from "../helpers/rss";
+
   let showAddForm = false;
   let rssUrl = "http://export.arxiv.org/rss/cs.AI";
-  let rssList = [];
   let feedsContent = [];
-  onMount(async () => {
-    const newRssList = await fetch("/api/list").then(r => r.json());
-    rssList = newRssList;
-  });
+
+  const createFeedUrls = () => {
+    const { subscribe, set, update } = writable([]);
+    return {
+      subscribe,
+      add: (url) => update(ls => [url, ...ls]),
+      delete: (url) => update(ls => ls.filter(x !== url))
+    }
+  }
+  const feedUrls = createFeedUrls()
+  
   const refreshFeeds = async () => {
-    const {feeds} = await fetch("/api/refresh").then(r => r.json());
+    // const {feeds} = await fetchRssFeeds($feedUrls);
+    const feeds = [];
     feedsContent = feeds
       .map(feed => {
         const { items, ...feedMeta } = feed;
@@ -22,32 +32,12 @@
   const toggleAddForm = () => {
     showAddForm = !showAddForm;
   };
-  const addRssToList = async () => {
+  const addRssToList = () => {
     showAddForm = false;
-    const { added, rssList: newRssList } = await fetch("/api/add", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ url: rssUrl })
-    }).then(r => r.json());
-    if (added) {
-      rssList = newRssList;
-      refreshFeeds();
-    }
+    return feedUrls.add(rssUrl);
   };
-  const removeFromList = async url => {
-    const { removed, rssList: newRssList } = await fetch("/api/del", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ url })
-    }).then(r => r.json());
-    if (removed) {
-      rssList = newRssList;
-      refreshFeeds();
-    }
+  const removeFromList = url => {
+    return feedUrls.delete(url);
   };
 </script>
 
@@ -97,7 +87,7 @@
   <div class="feed-list">
     <button on:click={toggleAddForm}>Add</button>
     <ul>
-      {#each rssList as feed}
+      {#each $feedUrls as feed}
         <li>
            {feed}
           <button on:click={() => removeFromList(feed)}>Remove</button>

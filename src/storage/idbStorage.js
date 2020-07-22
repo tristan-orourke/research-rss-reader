@@ -3,6 +3,23 @@ import eq from "lodash/eq";
 
 export default function idbStorage() {
 
+  function isAvailable() {
+    return typeof window !== 'undefined' && ('indexedDB' in window);
+  }
+
+  if (!isAvailable()) {
+    return {
+      isAvailable,
+      feedList: async () => [],
+      addFeed: async () => false,
+      deleteFeed: async () => false,
+      saveItem: async () => false,
+      forgetItem: async () => false,
+      getItem: async () => null,
+      getAllItems: async () => [],
+    };
+  }
+
   const ITEM_STORE = 'items';
   const FEED_STORE = 'feeds';
 
@@ -127,6 +144,7 @@ export default function idbStorage() {
   }
 
   return {
+    isAvailable,
     feedList,
     addFeed,
     deleteFeed,

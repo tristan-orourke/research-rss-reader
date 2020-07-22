@@ -3,7 +3,7 @@ import idbStorage from "../storage/idbStorage";
 
 const storage = idbStorage();
 
-function createFeeds() {
+function createFeedUrls() {
   const { subscribe, set } = writable([]);
   storage.feedList().then(set).catch(console.log);
   return {
@@ -24,7 +24,7 @@ function createFeeds() {
     }
   }
 }
-export const feeds = createFeeds();
+export const feedUrls = createFeedUrls();
 
 function createSavedItems() {
   const {subscribe, set} = writable([]);
@@ -48,9 +48,3 @@ function createSavedItems() {
   }
 }
 export const savedItems = createSavedItems();
-
-
-export async function getItemTags(itemUrl) {
-  const item = await storage.getItem(itemUrl);
-  return item?.tags ?? [];
-}

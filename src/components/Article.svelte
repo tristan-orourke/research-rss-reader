@@ -1,10 +1,8 @@
 <script>
-  import { getItemTags } from "./stores";
-
   export let item;
 
-  const tags = getItemTags(item.link);
-  $: console.log($tags);
+  $: tags = item.tags;
+
   let showTagForm = false;
   let newTag = "";
 
@@ -20,17 +18,17 @@
     newTag = "";
   }
   const addTag = async tag => {
-    const tagSet = new Set($tags);
+    const tagSet = new Set(tags);
     tagSet.add(tag);
     saveTags([...tagSet]);
   };
   const removeTag = async removedTag => {
-    const tagSet = new Set($tags);
+    const tagSet = new Set(tags);
     tagSet.delete(removedTag);
     saveTags([...tagSet]);
   };
   async function toggleTag(tag) {
-    $tags.includes(tag) ? removeTag(tag) : addTag(tag);
+    tags.includes(tag) ? removeTag(tag) : addTag(tag);
   }
   const saveTags = async newTags => {
     const { feed, ...coreItem } = item;
@@ -84,21 +82,21 @@
       return STATUS_CONSTANTS.new;
     }
   }
-  $: currentStatus = computeStatus($tags);
+  $: currentStatus = computeStatus(tags);
   function cycleStatus() {
     let newTags;
-    if ($tags.includes(statusTags.toRead)) {
+    if (tags.includes(statusTags.toRead)) {
       newTags = [
         statusTags.finished,
-        ...$tags.filter(e => e !== statusTags.toRead)
+        ...tags.filter(e => e !== statusTags.toRead)
       ];
-    } else if ($tags.includes(statusTags.finished)) {
+    } else if (tags.includes(statusTags.finished)) {
       newTags = [
         statusTags.toRead,
-        ...$tags.filter(e => e !== statusTags.finished)
+        ...tags.filter(e => e !== statusTags.finished)
       ];
     } else {
-      newTags = [statusTags.toRead, ...$tags];
+      newTags = [statusTags.toRead, ...tags];
     }
     saveTags(newTags);
   }
@@ -194,7 +192,7 @@
     {@html item.content}
   </details>
   <ul class="tag-list">
-    {#each $tags as tag}
+    {#each tags as tag}
       <li class="tag-item">{tag}</li>
     {/each}
   </ul>

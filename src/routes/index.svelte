@@ -13,14 +13,13 @@
     return {
       subscribe,
       add: (url) => update(ls => [url, ...ls]),
-      delete: (url) => update(ls => ls.filter(x !== url))
+      delete: (url) => update(ls => ls.filter(x => x !== url))
     }
   }
   const feedUrls = createFeedUrls()
   
   const refreshFeeds = async () => {
-    // const {feeds} = await fetchRssFeeds($feedUrls);
-    const feeds = [];
+    const feeds = await fetchRssFeeds($feedUrls);
     feedsContent = feeds
       .map(feed => {
         const { items, ...feedMeta } = feed;

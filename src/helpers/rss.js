@@ -1,8 +1,13 @@
 import Parser from "rss-parser";
 
+// Note: some RSS feeds can't be loaded in the browser due to CORS security.
+// To get around this, you can use a proxy.
+const CORS_PROXY = "https://cors-anywhere.herokuapp.com/"
+
 export async function fetchRssFeeds(feedUrls) {
   const parser = new Parser();
-  const fetchPromises = feedUrls.map(parser.parseUrl);
+  console.log(feedUrls);
+  const fetchPromises = feedUrls.map(url => parser.parseURL(CORS_PROXY + url));
   // Promise.allSettled resolves to an array of objects like {status: "fulfilled"|"rejected", value:any}
   const results = await Promise.allSettled(fetchPromises);
   return results.reduce((items, result) => {

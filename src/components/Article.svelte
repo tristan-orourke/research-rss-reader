@@ -1,7 +1,7 @@
 <script>
   export let item;
 
-  $: tags = item.tags;
+  $: tags = item.tags || [];
 
   let showTagForm = false;
   let newTag = "";
@@ -45,7 +45,7 @@
       body: JSON.stringify(body)
     }).then(r => r.json());
     if (savedItem.tags !== undefined) {
-      tags.set(savedItem.tags);
+      tags = savedItem.tags;
     }
   };
 

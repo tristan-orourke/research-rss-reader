@@ -3,29 +3,6 @@ import idbStorage from "../storage/idbStorage";
 
 const storage = idbStorage();
 
-function createFeedUrls() {
-  const { subscribe, set } = writable([]);
-  storage.feedList().then(set).catch(console.log);
-  return {
-    subscribe,
-    add: async (url) => {
-      const added = await storage.addFeed(url);
-      if (added) {
-        const rssList = await storage.feedList(); 
-        set(rssList);
-      }
-    },
-    delete: async (url) => {
-      const removed = await storage.deleteFeed(url);
-      if (removed) {
-        const rssList = await storage.feedList();
-        set(rssList);
-      }
-    }
-  }
-}
-export const feedUrls = createFeedUrls();
-
 function createSavedItems() {
   const {subscribe, set} = writable([]);
   storage.getAllItems().then(set).catch(console.log);

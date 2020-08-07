@@ -3,23 +3,25 @@
   import { writable } from 'svelte/store';
   import Article from "../components/Article.svelte";
   import { fetchRssFeeds } from "../helpers/rss";
+  import idbStorage from "../storage/idbStorage";
 
   let showAddForm = false;
   let rssUrl = "http://export.arxiv.org/rss/cs.AI";
   let feedsContent = [];
 
-  const createFeedUrls = () => {
-    const { subscribe, set, update } = writable([]);
-    return {
-      subscribe,
-      add: (url) => update(ls => [url, ...ls]),
-      delete: (url) => update(ls => ls.filter(x => x !== url))
-    }
-  }
-  const feedUrls = createFeedUrls()
+  let storage = null;
+  let feedUrls = [];
+
+  onMount(async () => {
+    // indexedDB is only available in the browser
+    console.log(idbStorage);
+    storage = idbStorage();
+    feedUrls = await storage.feedList();
+    refreshFeeds();
+  });
   
   const refreshFeeds = async () => {
-    const feeds = await fetchRssFeeds($feedUrls);
+    const feeds = await fetchRssFeeds(feedUrls);
     feedsContent = feeds
       .map(feed => {
         const { items, ...feedMeta } = feed;
@@ -31,12 +33,18 @@
   const toggleAddForm = () => {
     showAddForm = !showAddForm;
   };
-  const addRssToList = () => {
+  const addRssToList = async () => {
     showAddForm = false;
-    return feedUrls.add(rssUrl);
+    const added = await storage.addFeed(rssUrl);
+    if (added) {
+      feedUrls = [rssUrl, ...feedUrls];
+    }
   };
-  const removeFromList = url => {
-    return feedUrls.delete(url);
+  const removeFromList = async url => {
+    const removed = await storage.deleteFeed(url);
+    if (removed) {
+      feedUrls = feedUrls.filter(oldUrl => oldUrl !== url);
+    }
   };
 </script>
 
@@ -86,7 +94,7 @@
   <div class="feed-list">
     <button on:click={toggleAddForm}>Add</button>
     <ul>
-      {#each $feedUrls as feed}
+      {#each feedUrls as feed}
         <li>
            {feed}
           <button on:click={() => removeFromList(feed)}>Remove</button>

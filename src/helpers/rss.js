@@ -30,7 +30,7 @@ export function reconcileItems(liveItems, savedItems) {
 
   // Replace live items with corresponding saved items, and add saved items with no live equivalent.
   savedItems.forEach(item => {
-    item.set(item.link, item);
+    itemMap.set(item.link, item);
   });
 
   // Convert the map back to an array for returning.

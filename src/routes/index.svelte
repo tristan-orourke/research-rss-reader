@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import Article from "../components/Article.svelte";
-  import { fetchRssFeeds } from "../helpers/rss";
+  import { fetchRssFeeds, reconcileItems } from "../helpers/rss";
   import idbStorage from "../storage/idbStorage";
 
   let showAddForm = false;
@@ -20,12 +20,15 @@
   
   const refreshFeeds = async () => {
     const feeds = await fetchRssFeeds(feedUrls);
-    feedsContent = feeds
+    const liveItems = feeds
       .map(feed => {
         const { items, ...feedMeta } = feed;
         return items.map(item => ({ ...item, feed: feedMeta }));
       })
-      .reduce((acc, val) => acc.concat(val), [])
+      .reduce((acc, val) => acc.concat(val), []);
+    const savedItems = await storage.getAllItems();
+    // TODO: could improve performance slightly by awaiting live and saved feeds together with Promise.all().
+    feedsContent = reconcileItems(liveItems, savedItems)
       .sort((a, b) => new Date(b.isoDate) - new Date(a.isoDate));
   };
   const toggleAddForm = () => {

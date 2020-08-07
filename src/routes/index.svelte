@@ -1,6 +1,5 @@
 <script>
   import { onMount } from "svelte";
-  import { writable } from 'svelte/store';
   import Article from "../components/Article.svelte";
   import { fetchRssFeeds } from "../helpers/rss";
   import idbStorage from "../storage/idbStorage";
@@ -14,7 +13,6 @@
 
   onMount(async () => {
     // indexedDB is only available in the browser
-    console.log(idbStorage);
     storage = idbStorage();
     feedUrls = await storage.feedList();
     refreshFeeds();

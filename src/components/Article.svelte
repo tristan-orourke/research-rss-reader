@@ -1,10 +1,20 @@
 <script>
+  import { onMount } from "svelte";
+  import idbStorage from "../storage/idbStorage";
+  
   export let item;
-
-  $: tags = item.tags || [];
 
   let showTagForm = false;
   let newTag = "";
+
+  let storage = null;
+  let tags = [];
+
+  onMount(async () => {
+    // indexedDB is only available in the browser
+    storage = idbStorage();
+    tags = item.tags || [];
+  });
 
   const toggleAddForm = () => {
     showTagForm = !showTagForm;
@@ -32,20 +42,15 @@
   }
   const saveTags = async newTags => {
     const { feed, ...coreItem } = item;
-    const body = {
-      item: coreItem,
+    const newItem = {
+      ...coreItem,
       feedUrl: feed.link,
       tags: newTags
     };
-    const { savedItem } = await fetch("api/items/save", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(body)
-    }).then(r => r.json());
-    if (savedItem.tags !== undefined) {
-      tags = savedItem.tags;
+    console.log(newItem);
+    const saved = await storage.saveItem(newItem);
+    if (saved) {
+      tags = newTags;
     }
   };
 

@@ -19,7 +19,6 @@ export function apiRouter() {
   });
   router.post("del", (req, res) => {
     const { url } = req.body;
-    console.log("removing url", url);
     const removed = storage.deleteFeed(url);
     res.end(JSON.stringify({ removed, rssList: storage.feedList() }));
   });

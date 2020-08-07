@@ -44,10 +44,9 @@
     const { feed, ...coreItem } = item;
     const newItem = {
       ...coreItem,
-      feedUrl: feed.link,
+      feedUrl: coreItem.feedUrl || feed.link,
       tags: newTags
     };
-    console.log(newItem);
     const saved = await storage.saveItem(newItem);
     if (saved) {
       tags = newTags;

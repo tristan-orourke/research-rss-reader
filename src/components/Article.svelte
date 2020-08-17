@@ -3,6 +3,7 @@
   import idbStorage from "../storage/idbStorage";
   
   export let item;
+  export let handleRefreshTags;
 
   let showTagForm = false;
   let newTag = "";
@@ -51,6 +52,7 @@
     if (saved) {
       tags = newTags;
     }
+    handleRefreshTags();
   };
 
   const statusTags = {

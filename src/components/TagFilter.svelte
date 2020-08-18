@@ -1,5 +1,5 @@
 <script>
-  import {sort} from "../helpers/arrays";
+  import { sort } from "../helpers/arrays";
 
   export let tags;
   export let selectedTags;
@@ -8,6 +8,7 @@
   export let setUntaggedSelected;
 
   $: sortedTags = sort(tags);
+  $: allChecked = tags.length === selectedTags.length && untaggedSelected;
 
   function toggleTag(tag) {
     if (selectedTags.includes(tag)) {
@@ -21,27 +22,51 @@
     return setUntaggedSelected(!untaggedSelected);
   }
 
+  function toggleAll() {
+    if (allChecked) {
+      setSelectedTags([]);
+      setUntaggedSelected(false);
+    } else {
+      setSelectedTags(tags);
+      setUntaggedSelected(true);
+    }
+  }
 </script>
 
 <ul>
   <li>
-    <input
-      type="checkbox"
-      name="tags"
-      value="untagged"
-      checked={untaggedSelected}
-      on:click={toggleUntagged} />
-    <label for="untagged">UNTAGGED</label>
-  </li>
-  {#each sortedTags as tag}
-    <li>
+    <label>
       <input
         type="checkbox"
         name="tags"
-        value={tag}
-        checked={selectedTags.includes(tag)}
-        on:click={() => toggleTag(tag)} />
-      <label for={tag}>{tag}</label>
+        value="_all"
+        checked={allChecked}
+        on:click={toggleAll} />
+      {allChecked ? 'Unselect All' : 'Select All'}
+    </label>
+  </li>
+  <li>
+    <label>
+      <input
+        type="checkbox"
+        name="tags"
+        value="_untagged"
+        checked={untaggedSelected}
+        on:click={toggleUntagged} />
+      UNTAGGED
+    </label>
+  </li>
+  {#each sortedTags as tag}
+    <li>
+      <label>
+        <input
+          type="checkbox"
+          name="tags"
+          value={tag}
+          checked={selectedTags.includes(tag)}
+          on:click={() => toggleTag(tag)} />
+        {tag}
+      </label>
     </li>
   {/each}
 </ul>

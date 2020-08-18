@@ -6,6 +6,8 @@
   export let setSelectedTags;
   export let untaggedSelected;
   export let setUntaggedSelected;
+  export let showDeleteTag;
+  export let handleDeleteTag;
 
   $: sortedTags = sort(tags);
   $: allChecked = tags.length === selectedTags.length && untaggedSelected;
@@ -67,6 +69,11 @@
           on:click={() => toggleTag(tag)} />
         {tag}
       </label>
+      {#if showDeleteTag}
+        <button title="delete" on:click={() => handleDeleteTag(tag)}>
+          <i class="fa fa-trash" aria-hidden="true" />
+        </button>
+      {/if}
     </li>
   {/each}
 </ul>

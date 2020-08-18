@@ -18,6 +18,8 @@
   let selectedTags = [];
   let untaggedSelected = true;
 
+  let tagsLocked = true;
+
   $: filteredItems = filterItems(feedsContent, selectedTags, untaggedSelected);
 
   onMount(async () => {
@@ -89,6 +91,23 @@
       );
     });
   }
+
+  function deleteTag(tag) {
+    console.log(tag);
+    let operations = [];
+    feedsContent.forEach((item) => {
+      if (item.tags && item.tags.includes(tag)) {
+        const updatedItem = {
+          ...item,
+          tags: item.tags.filter((t) => t !== tag),
+        };
+        operations.push(storage.saveItem(updatedItem));
+      }
+    });
+    tags = tags.filter((t) => t !== tag);
+    selectedTags = selectedTags.filter((t) => t !== tag);
+    Promise.all(operations).then(refreshFeeds);
+  }
 </script>
 
 <style>
@@ -149,7 +168,14 @@
       {selectedTags}
       {setSelectedTags}
       {untaggedSelected}
-      {setUntaggedSelected} />
+      {setUntaggedSelected}
+      showDeleteTag={!tagsLocked}
+      handleDeleteTag={deleteTag} />
+    <div class="container">
+      <button on:click={() => (tagsLocked = !tagsLocked)}>
+        {tagsLocked ? 'Unlock Tags' : 'LOCK TAGS'}
+      </button>
+    </div>
   </div>
   <div class="articles">
     <div class="articles-actions">
@@ -157,7 +183,10 @@
     </div>
     <div class="articles-list">
       {#each filteredItems as item (item.link)}
-        <Article {item} handleRefreshTags={refreshFeeds} />
+        <Article
+          {item}
+          handleRefreshTags={refreshFeeds}
+          showDeleteTags={!tagsLocked} />
       {/each}
     </div>
   </div>

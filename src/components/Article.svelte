@@ -1,9 +1,10 @@
 <script>
   import { onMount } from "svelte";
   import idbStorage from "../storage/idbStorage";
-  
+
   export let item;
   export let handleRefreshTags;
+  export let showDeleteTags;
 
   let showTagForm = false;
   let newTag = "";
@@ -28,12 +29,12 @@
     toggleAddForm();
     newTag = "";
   }
-  const addTag = async tag => {
+  const addTag = async (tag) => {
     const tagSet = new Set(tags);
     tagSet.add(tag);
     saveTags([...tagSet]);
   };
-  const removeTag = async removedTag => {
+  const removeTag = async (removedTag) => {
     const tagSet = new Set(tags);
     tagSet.delete(removedTag);
     saveTags([...tagSet]);
@@ -41,12 +42,12 @@
   async function toggleTag(tag) {
     tags.includes(tag) ? removeTag(tag) : addTag(tag);
   }
-  const saveTags = async newTags => {
+  const saveTags = async (newTags) => {
     const { feed, ...coreItem } = item;
     const newItem = {
       ...coreItem,
       feedUrl: coreItem.feedUrl || feed.link,
-      tags: newTags
+      tags: newTags,
     };
     const saved = await storage.saveItem(newItem);
     if (saved) {
@@ -57,27 +58,27 @@
 
   const statusTags = {
     toRead: "status/toRead",
-    finished: "status/finished"
+    finished: "status/finished",
   };
   const STATUS_CONSTANTS = {
     new: {
       current: "New!",
       action: "Save",
       style: "status-button-new",
-      actionIcon: "fa-bookmark-o"
+      actionIcon: "fa-bookmark-o",
     },
     toRead: {
       current: "Saved",
       action: "Finish",
       style: "status-button-toread",
-      actionIcon: "fa-book"
+      actionIcon: "fa-book",
     },
     finished: {
       current: "Finished",
       action: "Restart",
       style: "status-button-finished",
-      actionIcon: "fa-repeat"
-    }
+      actionIcon: "fa-repeat",
+    },
   };
   function computeStatus(currentTags) {
     if (currentTags.includes(statusTags.finished)) {
@@ -94,12 +95,12 @@
     if (tags.includes(statusTags.toRead)) {
       newTags = [
         statusTags.finished,
-        ...tags.filter(e => e !== statusTags.toRead)
+        ...tags.filter((e) => e !== statusTags.toRead),
       ];
     } else if (tags.includes(statusTags.finished)) {
       newTags = [
         statusTags.toRead,
-        ...tags.filter(e => e !== statusTags.finished)
+        ...tags.filter((e) => e !== statusTags.finished),
       ];
     } else {
       newTags = [statusTags.toRead, ...tags];
@@ -183,7 +184,7 @@
             class="tag-input"
             type="text"
             bind:value={newTag}
-            on:keyup={e => e.key === 'Enter' && addNewTag()} />
+            on:keyup={(e) => e.key === 'Enter' && addNewTag()} />
           <button on:click={addNewTag}>Save</button>
         </div>
       {:else}
@@ -198,8 +199,15 @@
     {@html item.content}
   </details>
   <ul class="tag-list">
-    {#each tags as tag}
-      <li class="tag-item">{tag}</li>
+    {#each tags as tag (tag)}
+      <li class="tag-item">
+        {tag}
+        {#if showDeleteTags}
+          <button title="delete" on:click={() => removeTag(tag)}>
+            <i class="fa fa-trash" aria-hidden="true" />
+          </button>
+        {/if}
+      </li>
     {/each}
   </ul>
 </div>

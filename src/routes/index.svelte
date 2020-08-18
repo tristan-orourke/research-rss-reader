@@ -5,6 +5,7 @@
   import idbStorage from "../storage/idbStorage";
   import TagFilter from "../components/TagFilter.svelte";
   import Nav from "../components/Nav.svelte";
+  import { isEmpty } from "../helpers/arrays";
 
   let showAddForm = false;
   let rssUrl = "http://export.arxiv.org/rss/cs.AI";
@@ -15,6 +16,9 @@
 
   let tags = [];
   let selectedTags = [];
+  let untaggedSelected = true;
+
+  $: filteredItems = filterItems(feedsContent, selectedTags, untaggedSelected);
 
   onMount(async () => {
     // indexedDB is only available in the browser
@@ -42,11 +46,12 @@
   function refreshTags() {
     let newTags = [];
     feedsContent.forEach((item) => {
-      item.tags && item.tags.forEach((tag) => {
-        if (!tags.includes(tag)) {
-          newTags = [tag, ...newTags];
-        }
-      });
+      item.tags &&
+        item.tags.forEach((tag) => {
+          if (!tags.includes(tag)) {
+            newTags = [tag, ...newTags];
+          }
+        });
     });
     tags = [...newTags, ...tags];
     selectedTags = [...newTags, ...selectedTags];
@@ -72,12 +77,18 @@
   function setSelectedTags(tags) {
     selectedTags = tags;
   }
+  function setUntaggedSelected(selected) {
+    untaggedSelected = selected;
+  }
 
-  // function filterItems(items, tags) {
-  //   return items.filter(item => {
-  //     return item.tags && some()
-  //   })
-  // }
+  function filterItems(items, tags, untaggedAllowed) {
+    return items.filter((item) => {
+      return (
+        (untaggedAllowed && isEmpty(item.tags)) ||
+        (item.tags && item.tags.some((tag) => tags.includes(tag)))
+      );
+    });
+  }
 </script>
 
 <style>
@@ -133,14 +144,19 @@
         </li>
       {/each}
     </ul>
-    <TagFilter {tags} {selectedTags} {setSelectedTags} />
+    <TagFilter
+      {tags}
+      {selectedTags}
+      {setSelectedTags}
+      {untaggedSelected}
+      {setUntaggedSelected} />
   </div>
   <div class="articles">
     <div class="articles-actions">
       <button on:click={refreshFeeds}>Reload</button>
     </div>
     <div class="articles-list">
-      {#each feedsContent as item}
+      {#each filteredItems as item (item.link)}
         <Article {item} handleRefreshTags={refreshFeeds} />
       {/each}
     </div>

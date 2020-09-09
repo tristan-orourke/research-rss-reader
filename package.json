@@ -1,11 +1,12 @@
 {
   "name": "research-rss-reader",
-  "description": "A basic rss reader that can track which items are read and unread.",
+  "description": "A basic rss reader that can track which items are read and unread, and tag items.",
   "version": "0.1.0",
   "scripts": {
     "dev": "sapper dev",
     "build": "sapper build",
     "export": "sapper export",
+    "deploy": "npm run export && node ./scripts/gh-pages.js",
     "start": "node __sapper__/build",
     "cy:run": "cypress run",
     "cy:open": "cypress open",
@@ -27,6 +28,7 @@
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-svelte3": "^2.7.3",
+    "gh-pages": "^3.1.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.0.5",
     "prettier-plugin-svelte": "^1.1.0",
